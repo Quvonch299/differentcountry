@@ -2,25 +2,40 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FaRegMoon } from "react-icons/fa";
 import { MdOutlineWbSunny } from "react-icons/md";
+import AddCart from "./AddCart";
 
 export default function App() {
   const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
   const [dark, setDark] = useState(false);
+  const [select, setSelect] = useState('')
+  const [modal, setModal] = useState(true)
 
   const getData = async function () {
     try {
       const res = await axios.get(
         "https://restcountries.com/v3.1/all?fields=name,capital,population,currencies,flags,region,cca3,languages"
       );
+      console.log(res.data);
+      
       setData(res.data);
     } catch (e) {
       console.log(e);
     }
   };
+  useEffect(()=>{
+console.log(select);
+
+  },[select])
+     const OnClose = function(){
+        setModal(false)
+        setSelect('')
+      }
+
 
   useEffect(() => {
     getData();
+    setSelect('')
   }, []);
 
   const filtered = data.filter((item) =>
@@ -28,9 +43,12 @@ export default function App() {
   );
 
   return (
-    <div
-      className={`${dark ? "dark" : ""} min-h-screen p-6 transition-colors duration-300 dark:bg-[#333] dark:text-[#f3f3f3] bg-gray-100 text-gray-800`}
-    >
+   <div
+ className={`${dark ? "dark" : ""} min-h-screen p-6 transition-colors duration-300 
+  bg-gray-100 text-gray-800 dark:text-[#f3f3f3]
+  dark:bg-[linear-gradient(135deg,_#1e1b4b_0%,_#312e81_25%,_#4f46e5_50%,_#9333ea_75%,_#f43f5e_100%)]`}
+>
+
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">🌍 Countries</h1>
@@ -51,10 +69,12 @@ export default function App() {
         />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {filtered.map((post) => (
-            <div
+          {
+          
+          filtered.map((post) => (
+            <div  onClick={()=>{setSelect(post.cca3),setModal(true) }}
               key={post.cca3}
-              className="bg-white dark:bg-[#444] rounded-xl shadow hover:shadow-lg transition overflow-hidden"
+              className=" dark:bg-fuchsia-900 dark:text-black rounded-xl shadow hover:shadow-lg transition overflow-hidden"
             >
               <img
                 src={post.flags.png}
@@ -76,6 +96,9 @@ export default function App() {
             </div>
           ))}
         </div>
+          {
+            modal && <AddCart select={select} OnClose={OnClose}/>
+          }
       </div>
     </div>
   );
