@@ -4,26 +4,40 @@ import { IoClose } from "react-icons/io5";
 
 export default function AddCart({ select, OnClose }) {
   const [country, setCountry] = useState(null);
+  const [loading, setLoading] = useState(true); // loader state
 
   useEffect(() => {
     if (!select) return;
 
     const fetchCountry = async () => {
       try {
+        setLoading(true);  
         const res = await axios.get(
           "https://restcountries.com/v3.1/all?fields=name,capital,population,currencies,flags,region,cca3,languages"
         );
-        const found = res.data.find((c) => c.cca3 === select);
+        const found = res.data.find((c) => c.cca3 == select);
         setCountry(found);
+        setInterval(() => {
+          
+          setLoading(false);  
+        }, 3000);
       } catch (error) {
         console.error(error);
+        setLoading(false);
       }
     };
 
     fetchCountry();
   }, [select]);
 
-  if (!country) return <p className="text-center mt-10 text-gray-500">Loading...</p>;
+  if (loading)
+    return (
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50 p-4">
+        <div className="w-20 h-20 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div>
+      </div>
+    );
+
+  if (!country) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50 p-4">
