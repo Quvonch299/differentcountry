@@ -1,64 +1,70 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { AiOutlineClose } from "react-icons/ai";
+import axios from "axios";
+import { IoClose } from "react-icons/io5";
 
-export default function AddCart({ OnClose, select }) {
-  const [data, setData] = useState(null);
-
-  const GetData = async () => {
-    try {
-      const res = await axios.get(
-        `https://restcountries.com/v3.1/alpha/${select}?fields=name,capital,population,currencies,flags,region`
-      );
-      setData(res.data[0]); // alpha endpoint array ichida bitta obyekt qaytaradi
-    } catch (e) {
-      console.log(e);
-    }
-  };
+export default function AddCart({ select, OnClose }) {
+  const [country, setCountry] = useState(null);
 
   useEffect(() => {
-    if (select) {
-      GetData();
-    }
+    if (!select) return;
+
+    const fetchCountry = async () => {
+      try {
+        const res = await axios.get(
+          "https://restcountries.com/v3.1/all?fields=name,capital,population,currencies,flags,region,cca3,languages"
+        );
+        const found = res.data.find((c) => c.cca3 === select);
+        setCountry(found);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchCountry();
   }, [select]);
 
-  if (!data) return null;
+  if (!country) return <p className="text-center mt-10 text-gray-500">Loading...</p>;
 
   return (
-    <div className="fixed inset-0 flex items-center justiqfy-center bg-black/50 z-50">
-      <div className="bg-white rounded-xl p-6 w-[90%] max-w-xl relative">
-        <button className="absolute top-3 right-3 text-xl text-gray-600 hover:text-black">
-          <AiOutlineClose onClick={OnClose} />
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50 p-4">
+      <div className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-3xl shadow-2xl w-full max-w-lg p-6 relative overflow-auto max-h-[90vh]">
+        {/* Close button */}
+        <button
+          onClick={OnClose}
+          className="absolute top-2 right-2 text-2xl text-gray-700 dark:text-gray-300 hover:text-red-500 transition"
+        >
+          <IoClose />
         </button>
 
-        <section className="text-gray-600">
-          <div className="flex flex-col md:flex-row items-center gap-6">
-            
-           <img
-                src={data.flags.png}
-                alt="flag"
-                className="w-full h-40 object-cover"
-              />
+        <img
+          src={country.flags.png}
+          alt={`${country.name.common} flag`}
+          className="w-full h-56 object-cover rounded-xl shadow-md mb-6"
+        />
 
-            <div>
-              <h2 className="text-sm text-gray-500">Region: </h2>
-              <h1 className="text-gray-900 text-2xl font-semibold mb-2"></h1>
+        {/* Country Info */}
+        <h2 className="text-3xl font-bold mb-4 text-center">{country.name.common}</h2>
 
-              <p className="text-gray-700 mb-2">
-                Capital:d 
-              </p>
+        <div className="space-y-2 text-gray-700 dark:text-gray-300">
+          <p><b>Region:</b> {country.region}</p>
+          <p><b>Capital:</b> {country.capital ? country.capital[0] : "N/A"}</p>
+          <p><b>Population:</b> {country.population.toLocaleString()}</p>
 
-              <div className="flex items-center gap-4">
-                <span className="text-2xl font-bold text-gray-900">
-                  Population: 
-                </span>
-                <button className="bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700">
-                  Add
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
+          {country.currencies && (
+            <p>
+              <b>Currency:</b>{" "}
+              {Object.values(country.currencies)
+                .map((cur) => `${cur.name} (${cur.symbol})`)
+                .join(", ")}
+            </p>
+          )}
+
+          {country.languages && (
+            <p>
+              <b>Languages:</b> {Object.values(country.languages).join(", ")}
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );
