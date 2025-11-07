@@ -28,7 +28,6 @@ export default function AddCart({ select, OnClose }) {
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50 p-4">
       <div className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-3xl shadow-2xl w-full max-w-lg p-6 relative overflow-auto max-h-[90vh]">
-        {/* Close button */}
         <button
           onClick={OnClose}
           className="absolute top-2 right-2 text-2xl text-gray-700 dark:text-gray-300 hover:text-red-500 transition"
@@ -42,7 +41,6 @@ export default function AddCart({ select, OnClose }) {
           className="w-full h-56 object-cover rounded-xl shadow-md mb-6"
         />
 
-        {/* Country Info */}
         <h2 className="text-3xl font-bold mb-4 text-center">{country.name.common}</h2>
 
         <div className="space-y-2 text-gray-700 dark:text-gray-300">
